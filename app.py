@@ -25,7 +25,7 @@ app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(16))  # Use envi
 # Google OAuth Configuration
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', "981431793001-bmb2incqc028f3phfjghi38r5t5ih0qq.apps.googleusercontent.com")
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', "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")
-GOOGLE_REDIRECT_URI = os.environ.get('GOOGLE_REDIRECT_URI', "https://autopost.koyeb.app/api/auth/google/callback")
+GOOGLE_CALLBACK_URL = os.environ.get('GOOGLE_REDIRECT_URI', "https://autopost.koyeb.app/auth/oauth2callback")
 
 # MongoDB Configuration
 MONGODB_URI = os.environ.get('MONGODB_URI', "mongodb://raafatsamy109:hQm3tZYWWEjNI2WS@ac-phjothd-shard-00-00.jdjy8pd.mongodb.net:27017,ac-phjothd-shard-00-01.jdjy8pd.mongodb.net:27017,ac-phjothd-shard-00-02.jdjy8pd.mongodb.net:27017/?replicaSet=atlas-12rk7b-shard-0&ssl=true&authSource=admin&retryWrites=true&w=majority&appName=Cluster0")
