@@ -15,9 +15,21 @@ import threading
 import time
 from datetime import datetime, timedelta, timezone
 
-# Allow HTTP for local development only
-if os.environ.get('FLASK_ENV') == 'development':
+# Force HTTPS in production, allow HTTP only in development
+flask_env = os.environ.get('FLASK_ENV', 'production')
+print(f"FLASK_ENV: {flask_env}")
+
+# Check if we're running on Koyeb (production)
+is_production = 'koyeb' in os.environ.get('HOSTNAME', '').lower() or flask_env == 'production'
+print(f"Is production: {is_production}")
+
+if flask_env == 'development' and not is_production:
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    print("Development mode: Allowing insecure transport")
+else:
+    # Ensure HTTPS is required in production
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '0'
+    print("Production mode: Requiring HTTPS")
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(16))  # Use environment variable or generate a secure secret key
