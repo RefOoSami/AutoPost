@@ -119,16 +119,17 @@ def save_scheduled_post(user_id, post_data):
             # Parse the local time from frontend
             local_time = datetime.fromisoformat(post_data['scheduled_time'])
             
-            # Convert local time to UTC
-            # Get the local timezone offset
-            import time
-            local_offset = time.timezone if time.daylight == 0 else time.altzone
-            local_offset_hours = -local_offset / 3600  # Convert seconds to hours
+            # Get user's timezone from post_data (should be passed from schedule_post route)
+            user_timezone_offset = post_data.get('timezone_offset', 3)  # Default to GMT+3 if not provided
             
-            # Create timezone-aware local time
-            from datetime import timedelta
-            local_tz = timezone(timedelta(hours=local_offset_hours))
-            local_time = local_time.replace(tzinfo=local_tz)
+            # The frontend sends local time, but we need to convert it to UTC
+            # Since we're on Koyeb (UTC server), we need to handle this properly
+            
+            # Check if the time is already timezone-aware
+            if local_time.tzinfo is None:
+                # Create timezone-aware local time using user's timezone
+                user_timezone = timezone(timedelta(hours=user_timezone_offset))
+                local_time = local_time.replace(tzinfo=user_timezone)
             
             # Convert to UTC
             scheduled_time = local_time.astimezone(timezone.utc)
@@ -1165,16 +1166,17 @@ def schedule_post():
             # Parse the local time from frontend
             local_time = datetime.fromisoformat(data['scheduled_time'])
             
-            # Convert local time to UTC
-            # Get the local timezone offset
-            import time
-            local_offset = time.timezone if time.daylight == 0 else time.altzone
-            local_offset_hours = -local_offset / 3600  # Convert seconds to hours
+            # Get user's timezone from request (frontend should send this)
+            user_timezone_offset = data.get('timezone_offset', 3)  # Default to GMT+3 if not provided
             
-            # Create timezone-aware local time
-            from datetime import timedelta
-            local_tz = timezone(timedelta(hours=local_offset_hours))
-            local_time = local_time.replace(tzinfo=local_tz)
+            # The frontend sends local time, but we need to convert it to UTC
+            # Since we're on Koyeb (UTC server), we need to handle this properly
+            
+            # Check if the time is already timezone-aware
+            if local_time.tzinfo is None:
+                # Create timezone-aware local time using user's timezone
+                user_timezone = timezone(timedelta(hours=user_timezone_offset))
+                local_time = local_time.replace(tzinfo=user_timezone)
             
             # Convert to UTC
             scheduled_time = local_time.astimezone(timezone.utc)
@@ -1183,6 +1185,9 @@ def schedule_post():
                 return jsonify({'success': False, 'error': 'Scheduled time must be in the future'})
         except Exception as e:
             return jsonify({'success': False, 'error': f'Invalid scheduled time format: {str(e)}'})
+        
+        # Add timezone offset to data for save_scheduled_post
+        data['timezone_offset'] = user_timezone_offset
         
         # Save scheduled post
         post_id = save_scheduled_post(user_id, data)
