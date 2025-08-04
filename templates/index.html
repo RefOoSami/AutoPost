@@ -2743,12 +2743,16 @@
             // Wait for all images to be converted
             Promise.all(imagePromises)
                 .then(imageBlobs => {
+                    // Get user's timezone offset
+                    const timezoneOffset = new Date().getTimezoneOffset() / -60; // Convert to hours
+                    
                     // Prepare scheduled post data
                     const scheduledPostData = {
                         group_ids: selectedGroups.map(group => group.id),
                         main_caption: selectedPoster.caption,
                         cookies: selectedAccount.cookies,
                         scheduled_time: scheduledDateTime, // Send local time, backend will convert to UTC
+                        timezone_offset: timezoneOffset, // Send user's timezone offset
                         poster_name: selectedPoster.name,
                         account_name: selectedAccount.account_name,
                         groups: selectedGroups.map(group => group.name),
