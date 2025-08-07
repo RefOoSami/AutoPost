@@ -2313,12 +2313,6 @@
                                             <i class="fas fa-user-circle"></i>
                                             Select Account
                                         </div>
-                                        <div id="selectedAccountContainer">
-                                            <div class="alert alert-info">
-                                                <i class="fas fa-info-circle me-2"></i>
-                                                No account selected. Please select an account below.
-                                            </div>
-                                        </div>
                                         <div id="accountSelectorContent">
                                             <!-- Accounts will be loaded here -->
                                         </div>
@@ -3216,29 +3210,6 @@
             selectedAccount = accounts[index];
             loadAccountSelector();
             updateSelectedAccountDisplay();
-        }
-
-
-
-        function updateSelectedAccountDisplay() {
-            const container = document.getElementById('selectedAccountContainer');
-
-            if (!selectedAccount) {
-                container.innerHTML = `
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        No account selected. Please select an account above.
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = `
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle me-2"></i>
-                    Account selected: <strong>${selectedAccount.account_name}</strong>
-                </div>
-            `;
         }
 
         // Existing functions...
