@@ -55,6 +55,236 @@ except Exception as e:
 scheduler_running = False
 scheduler_thread = None
 
+
+def get_facebook_groups(cookies):
+    """
+    Extract all Facebook groups data using provided cookies.
+    
+    Args:
+        cookies (dict): Facebook cookies dictionary
+        
+    Returns:
+        dict: JSON object containing groups data with structure:
+        {
+            "groups": [
+                {
+                    "id": "group_id",
+                    "name": "group_name", 
+                    "url": "group_url",
+                    "image": "group_image_url"
+                }
+            ],
+            "pagination": {
+                "end_cursor": "cursor_for_next_page",
+                "has_next_page": true/false,
+                "total_groups": count
+            }
+        }
+    """
+    
+    headers = {
+        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+        'accept-language': 'ar-EG,ar;q=0.9,en-US;q=0.8,en;q=0.7',
+        'cache-control': 'max-age=0',
+        'dpr': '1.25',
+        'priority': 'u=0, i',
+        'sec-ch-prefers-color-scheme': 'dark',
+        'sec-ch-ua': '"Not)A;Brand";v="8", "Chromium";v="138", "Google Chrome";v="138"',
+        'sec-ch-ua-full-version-list': '"Not)A;Brand";v="8.0.0.0", "Chromium";v="138.0.7204.184", "Google Chrome";v="138.0.7204.184"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-model': '""',
+        'sec-ch-ua-platform': '"Windows"',
+        'sec-ch-ua-platform-version': '"19.0.0"',
+        'sec-fetch-dest': 'document',
+        'sec-fetch-mode': 'navigate',
+        'sec-fetch-site': 'same-origin',
+        'sec-fetch-user': '?1',
+        'upgrade-insecure-requests': '1',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36',
+        'viewport-width': '1059',
+    }
+
+    params = {
+        'nav_source': 'tab',
+        'locale': 'ar_AR',
+    }
+
+    response = requests.get('https://www.facebook.com/groups/joins/', params=params, cookies=cookies, headers=headers)
+
+    # Extract data between "all_joined_groups" and "total_joined_groups"
+    groups_data_pattern = r'"all_joined_groups":\{(.*?)\},"total_joined_groups"'
+    groups_data_match = re.search(groups_data_pattern, response.text, re.DOTALL)
+
+    if not groups_data_match:
+        return {"error": "Could not extract groups data section"}
+
+    groups_data_section = groups_data_match.group(1)
+    
+    # Extract data using regex patterns
+    try:
+        # Extract end_cursor
+        end_cursor_match = re.search(r'"end_cursor":"([^"]+)"', groups_data_section)
+        end_cursor = end_cursor_match.group(1) if end_cursor_match else None
+        
+        # Extract has_next_page
+        has_next_page_match = re.search(r'"has_next_page":(true|false)', groups_data_section)
+        has_next_page = has_next_page_match.group(1) == 'true' if has_next_page_match else False
+        
+        # Extract all group IDs
+        group_ids = re.findall(r'"id":"([^"]+)"', groups_data_section)
+        
+        # Extract all group names (handle Unicode escape sequences)
+        group_names = re.findall(r'"name":"([^"]+)"', groups_data_section)
+        
+        # Extract all group URLs
+        group_urls = re.findall(r'"url":"([^"]+)"', groups_data_section)
+        
+        # Extract all image URIs
+        image_uris = re.findall(r'"uri":"([^"]+)"', groups_data_section)
+        
+        # Create groups list from extracted data
+        extracted_groups = []
+        for i in range(len(group_ids)):
+            if i < len(group_names) and i < len(group_urls) and i < len(image_uris):
+                try:
+                    # Safely handle Unicode group names
+                    group_name = group_names[i]
+                    try:
+                        decoded_name = group_name.encode('latin-1').decode('unicode_escape')
+                    except:
+                        decoded_name = group_name  # Use original if decoding fails
+                    
+                    group = {
+                        'id': group_ids[i],
+                        'name': decoded_name,
+                        'url': group_urls[i],
+                        'image': image_uris[i]
+                    }
+                    extracted_groups.append(group)
+                except Exception:
+                    # Add group with original name if decoding fails
+                    group = {
+                        'id': group_ids[i],
+                        'name': group_names[i],
+                        'url': group_urls[i],
+                        'image': image_uris[i]
+                    }
+                    extracted_groups.append(group)
+        
+        # Extract other required data for pagination
+        userId = re.search(r'"userID":(\d+)', response.text).group(1)
+        lsd = re.search(r'"LSD",\s*\[\s*\],\s*\{\s*"token":\s*"([^"]+)"', response.text).group(1)
+        haste_session = re.search(r'"haste_session":\s*"([^"]+)"', response.text).group(1)
+        hsi = re.search(r'"hsi":\s*"([^"]+)"', response.text).group(1)
+        spin_r = re.search(r'"__spin_r":\s*(\d+)', response.text).group(1)
+        spin_t = re.search(r'"__spin_t":\s*(\d+)', response.text).group(1)
+        dtsg_token = re.search(r'"dtsg":\s*\{\s*"token":\s*"([^"]+)"', response.text).group(1)
+        jazoest = re.search(r'jazoest=(\d+)', response.text).group(1)
+        groups_joined = re.search(r'"total_joined_groups":\s*(\d+)', response.text).group(1)
+
+        # Pagination headers
+        pagination_headers = {
+            'accept': '*/*, application/vnd.t1c.pxr-209-12',
+            'accept-language': 'ar-EG,ar;q=0.9,en-US;q=0.8,en;q=0.7',
+            'content-type': 'application/x-www-form-urlencoded',
+            'origin': 'https://www.facebook.com',
+            'priority': 'u=1, i',
+            'referer': 'https://www.facebook.com/groups/joins/?nav_source=tab&locale=ar_AR',
+            'sec-ch-prefers-color-scheme': 'dark',
+            'sec-ch-ua': '"Not)A;Brand";v="8", "Chromium";v="138", "Google Chrome";v="138"',
+            'sec-ch-ua-full-version-list': '"Not)A;Brand";v="8.0.0.0", "Chromium";v="138.0.7204.184", "Google Chrome";v="138.0.7204.184"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-model': '""',
+            'sec-ch-ua-platform': '"Windows"',
+            'sec-ch-ua-platform-version': '"19.0.0"',
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36',
+            'x-asbd-id': '359341',
+            'x-fb-friendly-name': 'GroupsCometAllJoinedGroupsSectionPaginationQuery',
+            'x-fb-lsd': lsd,
+        }
+
+        # Fetch additional groups through pagination
+        while end_cursor and has_next_page:
+            data = {
+                'av': userId,
+                '__aaid': '0',
+                '__user': userId,
+                '__a': '1',
+                '__req': '19',
+                '__hs': haste_session,
+                'dpr': '1',
+                '__ccg': 'GOOD',
+                '__rev': spin_r,
+                '__s': '6e0d9y:frfdm9:k4s3gd',
+                '__hsi': hsi,
+                '__comet_req': '15',
+                'locale': 'ar_AR',
+                'fb_dtsg': dtsg_token,
+                'jazoest': '25434',
+                'lsd': lsd,
+                '__spin_r': spin_r,
+                '__spin_b': 'trunk',
+                '__spin_t': spin_t,
+                '__crn': 'comet.fbweb.CometGroupsJoinsRoute',
+                'fb_api_caller_class': 'RelayModern',
+                'fb_api_req_friendly_name': 'GroupsCometAllJoinedGroupsSectionPaginationQuery',
+                'variables': '{"count":40,"cursor":"'+end_cursor+'","ordering":["integrity_signals"],"scale":1}',
+                'server_timestamps': 'true',
+                'doc_id': '9974006939348139',
+            }
+
+            response = requests.post('https://www.facebook.com/api/graphql/', cookies=cookies, headers=pagination_headers, data=data)
+            response_data = json.loads(response.text)
+            
+            # Extract groups data from pagination response
+            paginated_groups_data = response_data['data']['viewer']['all_joined_groups']['tab_groups_list']
+            
+            for edge in paginated_groups_data['edges']:
+                node = edge['node']
+                try:
+                    # Safely handle Unicode group names in pagination
+                    group_name = node['name']
+                    try:
+                        decoded_name = group_name.encode('latin-1').decode('unicode_escape')
+                    except:
+                        decoded_name = group_name  # Use original if decoding fails
+                    
+                    group = {
+                        'id': node['id'],
+                        'name': decoded_name,
+                        'image': node['profile_picture']['uri'],
+                        'url': node['url']
+                    }
+                    extracted_groups.append(group)
+                except Exception:
+                    # Add group with original name if decoding fails
+                    group = {
+                        'id': node['id'],
+                        'name': node['name'],
+                        'image': node['profile_picture']['uri'],
+                        'url': node['url']
+                    }
+                    extracted_groups.append(group)
+
+            # Extract end_cursor for next pagination
+            end_cursor = paginated_groups_data['page_info']['end_cursor']
+            has_next_page = paginated_groups_data['page_info']['has_next_page']
+
+        # Return JSON result
+        return {
+            "groups": extracted_groups,
+            "pagination": {
+                "end_cursor": end_cursor,
+                "has_next_page": has_next_page,
+                "total_groups": len(extracted_groups)
+            }
+        }
+            
+    except Exception as e:
+        return {"error": f"Error extracting data: {str(e)}"}
 # Database helper functions
 def get_user_data(user_id):
     """Get user data from MongoDB"""
@@ -256,51 +486,69 @@ def scheduler_worker():
             post = get_and_mark_due_post()
             if post:
                 print(f"[Scheduler] Picked post {post['_id']} for processing at {datetime.now(timezone.utc).isoformat()}")
+                print(f"[Scheduler] Post details: {post.get('poster_name', 'Unknown')} - {post.get('account_name', 'Unknown')} - {len(post.get('group_ids', []))} groups")
                 try:
-                    print(f"Publishing scheduled post {post['_id']}")
+                    print(f"[Scheduler] Starting to publish scheduled post {post['_id']}")
                     
                     # Parse cookies
+                    print(f"[Scheduler] Parsing cookies for post {post['_id']}")
                     cookies_text = post['cookies']
                     cookies = {}
                     for line in cookies_text.strip().split(';'):
                         if '=' in line:
                             key, value = line.split('=', 1)
                             cookies[key.strip()] = value.strip()
+                    print(f"[Scheduler] Parsed {len(cookies)} cookies")
                     
                     # Prepare image files
+                    print(f"[Scheduler] Preparing {len(post['images'])} images for post {post['_id']}")
                     image_files = []
-                    for image_data in post['images']:
-                        # Convert base64 to temporary file
-                        import base64
-                        image_data_b64 = image_data['data'].split(',')[1]
-                        image_bytes = base64.b64decode(image_data_b64)
-                        
-                        # Save to temporary file
-                        temp_filename = f"temp_{uuid.uuid4()}.jpg"
-                        temp_filepath = os.path.join(app.config['UPLOAD_FOLDER'], temp_filename)
-                        
-                        with open(temp_filepath, 'wb') as f:
-                            f.write(image_bytes)
-                        
-                        image_files.append({
-                            'path': temp_filepath,
-                            'caption': image_data.get('caption', '')
-                        })
+                    for i, image_data in enumerate(post['images']):
+                        try:
+                            # Convert base64 to temporary file
+                            import base64
+                            image_data_b64 = image_data['data'].split(',')[1]
+                            image_bytes = base64.b64decode(image_data_b64)
+                            
+                            # Save to temporary file
+                            temp_filename = f"temp_{uuid.uuid4()}.jpg"
+                            temp_filepath = os.path.join(app.config['UPLOAD_FOLDER'], temp_filename)
+                            
+                            with open(temp_filepath, 'wb') as f:
+                                f.write(image_bytes)
+                            
+                            image_files.append({
+                                'path': temp_filepath,
+                                'caption': image_data.get('caption', '')
+                            })
+                            print(f"[Scheduler] Prepared image {i+1}/{len(post['images'])}: {temp_filename}")
+                        except Exception as e:
+                            print(f"[Scheduler] Error preparing image {i+1}: {e}")
+                    print(f"[Scheduler] Successfully prepared {len(image_files)} images")
                     
                     results = []
                     errors = []
                     
                     # Post to each group
-                    for group_id in post['group_ids']:
+                    print(f"[Scheduler] Starting to post to {len(post['group_ids'])} groups")
+                    for i, group_id in enumerate(post['group_ids']):
+                        print(f"[Scheduler] Processing group {i+1}/{len(post['group_ids'])}: {group_id}")
                         try:
                             # Extract Facebook data for this group
+                            print(f"[Scheduler] Extracting Facebook data for group {group_id}")
                             facebook_data = extract_facebook_data(group_id, cookies)
+                            print(f"[Scheduler] Facebook data extracted successfully for group {group_id}")
                             
                             # Upload images for each group
+                            print(f"[Scheduler] Uploading {len(image_files)} images for group {group_id}")
                             attachments = upload_images(image_files, facebook_data, cookies)
+                            print(f"[Scheduler] Images uploaded successfully for group {group_id}: {len(attachments)} attachments")
                             
                             # Create post for this group
+                            print(f"[Scheduler] Creating post for group {group_id}")
                             result = create_post(group_id, post['main_caption'], attachments, facebook_data, cookies)
+                            print(f"[Scheduler] Post created successfully for group {group_id}: {result}")
+                            
                             results.append({
                                 'group_id': group_id,
                                 'status': 'success',
@@ -308,17 +556,23 @@ def scheduler_worker():
                             })
                             
                         except Exception as e:
+                            print(f"[Scheduler] Error posting to group {group_id}: {e}")
+                            import traceback
+                            print(f"[Scheduler] Full traceback for group {group_id}:")
+                            print(traceback.format_exc())
                             errors.append({
                                 'group_id': group_id,
                                 'error': str(e)
                             })
                     
                     # Clean up temporary files
+                    print(f"[Scheduler] Cleaning up {len(image_files)} temporary files")
                     for image_file in image_files:
                         if os.path.exists(image_file['path']):
                             os.remove(image_file['path'])
                     
                     # Update post status
+                    print(f"[Scheduler] Processing results: {len(results)} successful, {len(errors)} errors")
                     if results:
                         status = 'published' if not errors else 'partial'
                         result_data = {
@@ -328,11 +582,14 @@ def scheduler_worker():
                             'successful_posts': len(results),
                             'failed_posts': len(errors)
                         }
+                        print(f"[Scheduler] Post {post['_id']} status: {status} - {len(results)} successful posts")
                     else:
                         status = 'failed'
                         result_data = {'error': 'Failed to post to any groups'}
+                        print(f"[Scheduler] Post {post['_id']} status: {status} - No successful posts")
                     
                     update_post_status(str(post['_id']), status, result_data)
+                    print(f"[Scheduler] Post {post['_id']} processing completed")
                     
                 except Exception as e:
                     print(f"Error processing scheduled post {post['_id']}: {e}")
@@ -378,6 +635,8 @@ def generate_session_id():
 
 def extract_facebook_data(group_id, cookies):
     """Extract necessary Facebook data from the group page"""
+    print(f"[Facebook] Extracting data for group {group_id}")
+    
     headers = {
         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
         'accept-language': 'ar-EG,ar;q=0.9,en-US;q=0.8,en;q=0.7',
@@ -405,19 +664,74 @@ def extract_facebook_data(group_id, cookies):
     }
 
     try:
+        print(f"[Facebook] Making request to https://www.facebook.com/groups/{group_id}")
         response = requests.get(f'https://www.facebook.com/groups/{group_id}', params=params, cookies=cookies, headers=headers)
+        print(f"[Facebook] Response status: {response.status_code}")
+        
+        if response.status_code != 200:
+            print(f"[Facebook] Error response: {response.text[:500]}...")
+            raise Exception(f"Facebook returned status {response.status_code}")
         
         # Extract data using regex
-        userId = re.search(r'"userID":(\d+)', response.text).group(1)
-        lsd = re.search(r'"LSD",\s*\[\s*\],\s*\{\s*"token":\s*"([^"]+)"', response.text).group(1)
-        haste_session = re.search(r'"haste_session":\s*"([^"]+)"', response.text).group(1)
-        hsi = re.search(r'"hsi":\s*"([^"]+)"', response.text).group(1)
-        spin_r = re.search(r'"__spin_r":\s*(\d+)', response.text).group(1)
-        spin_t = re.search(r'"__spin_t":\s*(\d+)', response.text).group(1)
-        dtsg_token = re.search(r'"dtsg":\s*\{\s*"token":\s*"([^"]+)"', response.text).group(1)
-        jazoest = re.search(r'jazoest=(\d+)', response.text).group(1)
+        print(f"[Facebook] Extracting tokens from response...")
         
-        return {
+        userId_match = re.search(r'"userID":(\d+)', response.text)
+        if not userId_match:
+            print(f"[Facebook] Could not find userID in response")
+            raise Exception("Could not extract userID")
+        userId = userId_match.group(1)
+        print(f"[Facebook] Found userID: {userId}")
+        
+        lsd_match = re.search(r'"LSD",\s*\[\s*\],\s*\{\s*"token":\s*"([^"]+)"', response.text)
+        if not lsd_match:
+            print(f"[Facebook] Could not find LSD token in response")
+            raise Exception("Could not extract LSD token")
+        lsd = lsd_match.group(1)
+        print(f"[Facebook] Found LSD token: {lsd[:10]}...")
+        
+        haste_session_match = re.search(r'"haste_session":\s*"([^"]+)"', response.text)
+        if not haste_session_match:
+            print(f"[Facebook] Could not find haste_session in response")
+            raise Exception("Could not extract haste_session")
+        haste_session = haste_session_match.group(1)
+        print(f"[Facebook] Found haste_session: {haste_session[:10]}...")
+        
+        hsi_match = re.search(r'"hsi":\s*"([^"]+)"', response.text)
+        if not hsi_match:
+            print(f"[Facebook] Could not find hsi in response")
+            raise Exception("Could not extract hsi")
+        hsi = hsi_match.group(1)
+        print(f"[Facebook] Found hsi: {hsi[:10]}...")
+        
+        spin_r_match = re.search(r'"__spin_r":\s*(\d+)', response.text)
+        if not spin_r_match:
+            print(f"[Facebook] Could not find __spin_r in response")
+            raise Exception("Could not extract __spin_r")
+        spin_r = spin_r_match.group(1)
+        print(f"[Facebook] Found __spin_r: {spin_r}")
+        
+        spin_t_match = re.search(r'"__spin_t":\s*(\d+)', response.text)
+        if not spin_t_match:
+            print(f"[Facebook] Could not find __spin_t in response")
+            raise Exception("Could not extract __spin_t")
+        spin_t = spin_t_match.group(1)
+        print(f"[Facebook] Found __spin_t: {spin_t}")
+        
+        dtsg_match = re.search(r'"dtsg":\s*\{\s*"token":\s*"([^"]+)"', response.text)
+        if not dtsg_match:
+            print(f"[Facebook] Could not find dtsg token in response")
+            raise Exception("Could not extract dtsg token")
+        dtsg_token = dtsg_match.group(1)
+        print(f"[Facebook] Found dtsg token: {dtsg_token[:10]}...")
+        
+        jazoest_match = re.search(r'jazoest=(\d+)', response.text)
+        if not jazoest_match:
+            print(f"[Facebook] Could not find jazoest in response")
+            raise Exception("Could not extract jazoest")
+        jazoest = jazoest_match.group(1)
+        print(f"[Facebook] Found jazoest: {jazoest}")
+        
+        result = {
             'userId': userId,
             'lsd': lsd,
             'haste_session': haste_session,
@@ -427,11 +741,20 @@ def extract_facebook_data(group_id, cookies):
             'dtsg_token': dtsg_token,
             'jazoest': jazoest
         }
+        
+        print(f"[Facebook] Successfully extracted all tokens for group {group_id}")
+        return result
+        
     except Exception as e:
+        print(f"[Facebook] Error extracting Facebook data for group {group_id}: {e}")
+        import traceback
+        print(f"[Facebook] Full traceback:")
+        print(traceback.format_exc())
         raise Exception(f"Failed to extract Facebook data: {str(e)}")
 
 def upload_images(image_files, facebook_data, cookies):
     """Upload images and return attachments with captions"""
+    print(f"[UploadImages] Starting to upload {len(image_files)} images")
     params = {
         'av': facebook_data['userId'],
         '__aaid': '0',
@@ -471,9 +794,10 @@ def upload_images(image_files, facebook_data, cookies):
     
     attachments = []
     
-    for image_data in image_files:
+    for i, image_data in enumerate(image_files):
         image_path = image_data['path']
         caption = image_data.get('caption', None)
+        print(f"[UploadImages] Uploading image {i+1}/{len(image_files)}: {os.path.basename(image_path)}")
         
         files = {
             'source': (None, '8'),
@@ -483,6 +807,7 @@ def upload_images(image_files, facebook_data, cookies):
             'upload_id': (None, 'jsc_c_6'),
         }
 
+        print(f"[UploadImages] Making upload request for image {i+1}...")
         response = requests.post(
             'https://upload.facebook.com/ajax/react_composer/attachments/photo/upload',
             params=params,
@@ -491,17 +816,34 @@ def upload_images(image_files, facebook_data, cookies):
             files=files,
         )
         
-        photo_id = re.search(r'"photoID":\s*"([^"]+)"', response.text).group(1)
+        print(f"[UploadImages] Upload response status: {response.status_code}")
+        print(f"[UploadImages] Upload response: {response.text[:200]}...")
+        
+        if response.status_code != 200:
+            print(f"[UploadImages] Error: Upload failed with status {response.status_code}")
+            raise Exception(f"Image upload failed with status {response.status_code}")
+        
+        photo_id_match = re.search(r'"photoID":\s*"([^"]+)"', response.text)
+        if not photo_id_match:
+            print(f"[UploadImages] Error: Could not extract photoID from response")
+            raise Exception("Could not extract photoID from upload response")
+        
+        photo_id = photo_id_match.group(1)
+        print(f"[UploadImages] Successfully uploaded image {i+1}, photoID: {photo_id}")
         
         attachment = {"photo": {"id": photo_id}}
         if caption:
             attachment["photo"]["message"] = {"text": caption}
         attachments.append(attachment)
     
+    print(f"[UploadImages] Successfully uploaded all {len(attachments)} images")
     return attachments
 
 def create_post(group_id, main_caption, attachments, facebook_data, cookies):
     """Create the post with images and captions"""
+    print(f"[CreatePost] Creating post for group {group_id}")
+    print(f"[CreatePost] Main caption: {main_caption[:50]}...")
+    print(f"[CreatePost] Number of attachments: {len(attachments)}")
     variables_data = {
         "input": {
             "composer_entry_point": "inline_composer",
@@ -636,7 +978,21 @@ def create_post(group_id, main_caption, attachments, facebook_data, cookies):
         'x-fb-lsd': facebook_data['lsd'],
     }
 
+    print(f"[CreatePost] Making GraphQL request to Facebook API...")
     response = requests.post('https://www.facebook.com/api/graphql/', cookies=cookies, headers=headers, data=data)
+    print(f"[CreatePost] Response status: {response.status_code}")
+    print(f"[CreatePost] Response text: {response.text[:500]}...")
+    
+    if response.status_code != 200:
+        print(f"[CreatePost] Error: Facebook API returned status {response.status_code}")
+        raise Exception(f"Facebook API returned status {response.status_code}")
+    
+    # Check for errors in response
+    if '"errors"' in response.text:
+        print(f"[CreatePost] Error: Facebook API returned errors in response")
+        raise Exception(f"Facebook API returned errors: {response.text}")
+    
+    print(f"[CreatePost] Post created successfully for group {group_id}")
     return response.text
 
 @app.route('/fetch_account_info', methods=['POST'])
@@ -866,6 +1222,86 @@ def save_group():
         else:
             return jsonify({'success': False, 'error': 'Failed to save group'})
             
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/fetch_account_groups', methods=['POST'])
+def fetch_account_groups():
+    """Fetch all groups joined by the selected account using getGroups.py"""
+    try:
+        if not session.get('authenticated'):
+            return jsonify({'success': False, 'error': 'Not authenticated'})
+        
+        data = request.get_json()
+        account_id = data.get('account_id')
+        
+        if not account_id:
+            return jsonify({'success': False, 'error': 'Account ID is required'})
+        
+        # Get user accounts to find the selected account
+        user_id = session.get('user_id')
+        user_data = get_user_data(user_id)
+        
+        if not user_data or 'accounts' not in user_data:
+            return jsonify({'success': False, 'error': 'No accounts found'})
+        
+        accounts = user_data['accounts']
+        selected_account = None
+        
+        for account in accounts:
+            if account.get('user_id') == account_id:
+                selected_account = account
+                break
+        
+        if not selected_account:
+            return jsonify({'success': False, 'error': 'Account not found'})
+        
+        cookies_text = selected_account['cookies']
+        
+        # Parse cookies from string format
+        cookies = {}
+        for line in cookies_text.strip().split(';'):
+            if '=' in line:
+                key, value = line.split('=', 1)
+                cookies[key.strip()] = value.strip()
+         
+        # Get all joined groups
+        result = get_facebook_groups(cookies)
+        print(result)
+        if 'error' in result:
+            return jsonify({'success': False, 'error': result['error']})
+        
+        # Format the groups data for frontend
+        groups_data = []
+        for group in result.get('groups', []):
+            # Clean and validate image URL
+            image_url = group.get('image', '')
+            if image_url:
+                # Remove escaped backslashes and ensure proper URL format
+                image_url = image_url.replace('\\/', '/')
+                if not image_url.startswith('http'):
+                    image_url = 'https://scontent.fcai16-1.fna.fbcdn.net' + image_url
+            
+            # Clean group URL
+            group_url = group.get('url', '')
+            if group_url:
+                group_url = group_url.replace('\\/', '/')
+            
+            groups_data.append({
+                'id': group['id'],
+                'name': group['name'],
+                'url': group_url,
+                'image_url': image_url,
+                'member_count': 'Unknown'  # Facebook doesn't provide member count in this API
+            })
+        
+        return jsonify({
+            'success': True,
+            'groups': groups_data,
+            'account_name': selected_account['account_name'],
+            'total_groups': len(groups_data)
+        })
+        
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
@@ -1246,6 +1682,19 @@ def delete_scheduled_post_route():
         else:
             return jsonify({'success': False, 'error': 'Failed to delete scheduled post or post not found'})
             
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/clear_scheduled_history', methods=['POST'])
+def clear_scheduled_history():
+    try:
+        if not session.get('authenticated'):
+            return jsonify({'success': False, 'error': 'Not authenticated'})
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'success': False, 'error': 'User not found'})
+        result = db.scheduled_posts.delete_many({'user_id': user_id})
+        return jsonify({'success': True, 'deleted_count': result.deleted_count})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
