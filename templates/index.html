@@ -162,31 +162,62 @@
             right: 20px;
             z-index: 9999;
             max-width: 400px;
-            animation: slideInRight 0.3s ease-out;
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            backdrop-filter: blur(10px);
+            animation: slideInRight 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 1rem 1.25rem;
+        }
+
+        .floating-notification.alert-success {
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.95) 0%, rgba(32, 201, 151, 0.95) 100%);
+            color: white;
+            border-left: 4px solid #28a745;
+        }
+
+        .floating-notification.alert-error {
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.95) 0%, rgba(255, 107, 107, 0.95) 100%);
+            color: white;
+            border-left: 4px solid #dc3545;
+        }
+
+        .floating-notification.alert-warning {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.95) 0%, rgba(255, 152, 0, 0.95) 100%);
+            color: #212529;
+            border-left: 4px solid #ffc107;
+        }
+
+        .floating-notification.alert-info {
+            background: linear-gradient(135deg, rgba(24, 119, 242, 0.95) 0%, rgba(66, 165, 245, 0.95) 100%);
+            color: white;
+            border-left: 4px solid #1877f2;
         }
 
         .floating-notification.fade-out {
-            animation: fadeOut 0.5s ease-out forwards;
+            animation: fadeOut 0.5s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
         }
 
         @keyframes slideInRight {
             from {
-                transform: translateX(100%);
+                transform: translateX(100%) scale(0.8);
                 opacity: 0;
             }
             to {
-                transform: translateX(0);
+                transform: translateX(0) scale(1);
                 opacity: 1;
             }
         }
 
         @keyframes fadeOut {
             from {
-                transform: translateX(0);
+                transform: translateX(0) scale(1);
                 opacity: 1;
             }
             to {
-                transform: translateX(100%);
+                transform: translateX(100%) scale(0.8);
                 opacity: 0;
             }
         }
@@ -263,6 +294,7 @@
         }
 
         .sidebar-nav {
+            z-index: 999;
             padding: 1rem 0;
             display: flex;
             flex-direction: column;
@@ -456,6 +488,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 1rem;
+            padding: 0.5rem;
         }
 
         .group-tag {
@@ -471,11 +504,13 @@
             gap: 0.75rem;
             height: 80px;
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .group-tag:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(24, 119, 242, 0.2);
+            background: linear-gradient(135deg, #d1e7ff 0%, #e7f3ff 100%);
         }
 
         .group-tag .remove-group {
@@ -650,11 +685,7 @@
             margin: 0.25rem;
         }
 
-        .group-tag .member-count {
-            font-size: 0.8rem;
-            color: #65676b;
-            font-weight: 400;
-        }
+
 
         .group-tag .group-avatar {
             width: 48px;
@@ -932,6 +963,95 @@
             object-fit: cover;
             border-radius: 12px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-preview-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .image-actions {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .image-preview-wrapper:hover .image-actions {
+            opacity: 1;
+        }
+
+        .remove-image-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            padding: 0;
+        }
+
+        .drag-handle {
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            color: #65676b;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .drag-handle:hover {
+            background: rgba(255, 255, 255, 1);
+            color: #1877f2;
+            transform: scale(1.1);
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .image-order-badge {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: rgba(24, 119, 242, 0.9);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .image-preview-container.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+            z-index: 1000;
+        }
+
+        .image-preview-container.drag-over {
+            border: 2px dashed #1877f2;
+            background: rgba(24, 119, 242, 0.05);
+        }
+
+        .image-preview-container {
+            cursor: grab;
+        }
+
+        .image-preview-container:active {
+            cursor: grabbing;
         }
 
         .btn-primary {
@@ -1223,6 +1343,22 @@
             gap: 0.5rem;
         }
 
+        .edit-poster-btn {
+            background: none;
+            border: 1px solid #17a2b8;
+            color: #17a2b8;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .edit-poster-btn:hover {
+            background: #17a2b8;
+            color: white;
+        }
+
         .remove-poster-btn {
             background: none;
             border: 1px solid #dc3545;
@@ -1265,51 +1401,717 @@
             word-break: break-word;
         }
 
-        /* Scheduled Posts Styles */
-        .scheduled-post {
-            border-left: 4px solid #ffc107;
+        /* Modern Scheduled Posts Styles */
+        .scheduled-posts-container {
+            display: grid;
+            gap: 1.5rem;
         }
 
-        .published-post {
-            border-left: 4px solid #28a745;
+        .post-card {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
-        .partial-post {
-            border-left: 4px solid #fd7e14;
+        .post-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
         }
 
-        .failed-post {
-            border-left: 4px solid #dc3545;
+        .post-card.scheduled {
+            border-left: 6px solid #ffc107;
+            background: linear-gradient(135deg, #fff9e6 0%, #ffffff 100%);
         }
 
-        .unknown-post {
-            border-left: 4px solid #6c757d;
+        .post-card.published {
+            border-left: 6px solid #28a745;
+            background: linear-gradient(135deg, #e8f5e8 0%, #ffffff 100%);
         }
 
-        .badge {
+        .post-card.partial {
+            border-left: 6px solid #fd7e14;
+            background: linear-gradient(135deg, #fff3e0 0%, #ffffff 100%);
+        }
+
+        .post-card.failed {
+            border-left: 6px solid #dc3545;
+            background: linear-gradient(135deg, #ffeaea 0%, #ffffff 100%);
+        }
+
+        .post-card.unknown {
+            border-left: 6px solid #6c757d;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        }
+
+        .post-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .post-info {
+            flex: 1;
+        }
+
+        .post-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1c1e21;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .post-title i {
+            font-size: 1.1rem;
+            opacity: 0.7;
+        }
+
+        .post-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #65676b;
+            background: rgba(0, 0, 0, 0.03);
+            padding: 0.5rem 0.75rem;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .meta-item i {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .post-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-badge.scheduled {
+            background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
+            color: #000;
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+        }
+
+        .status-badge.published {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        .status-badge.partial {
+            background: linear-gradient(135deg, #fd7e14 0%, #ff8c00 100%);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(253, 126, 20, 0.3);
+        }
+
+        .status-badge.failed {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+
+        .status-badge.unknown {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+
+        .post-body {
+            padding: 1.5rem 2rem;
+        }
+
+        .post-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .detail-item {
+            background: rgba(0, 0, 0, 0.02);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .detail-label {
             font-size: 0.75rem;
-            padding: 0.375rem 0.75rem;
-            border-radius: 0.375rem;
+            color: #65676b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
         }
 
-        .bg-warning {
-            background-color: #ffc107 !important;
-            color: #000 !important;
+        .detail-value {
+            font-size: 0.9rem;
+            color: #1c1e21;
+            font-weight: 500;
         }
 
-        .bg-success {
-            background-color: #28a745 !important;
-            color: #fff !important;
+        .post-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
         }
 
-        .bg-danger {
-            background-color: #dc3545 !important;
-            color: #fff !important;
+        .action-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            cursor: pointer;
         }
 
-        .bg-secondary {
-            background-color: #6c757d !important;
-            color: #fff !important;
+        .action-btn.cancel {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+        }
+
+        .action-btn.cancel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(220, 53, 69, 0.3);
+        }
+
+        .result-info {
+            background: rgba(0, 0, 0, 0.03);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-left: 4px solid #1877f2;
+        }
+
+        .result-info.success {
+            background: rgba(40, 167, 69, 0.05);
+            border-left-color: #28a745;
+        }
+
+        .result-info.error {
+            background: rgba(220, 53, 69, 0.05);
+            border-left-color: #dc3545;
+        }
+
+        .result-info.warning {
+            background: rgba(255, 193, 7, 0.05);
+            border-left-color: #ffc107;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #65676b;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .empty-state h4 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #1c1e21;
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+            opacity: 0.7;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .post-header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .post-body {
+                padding: 1rem;
+            }
+
+            .post-details {
+                grid-template-columns: 1fr;
+            }
+
+            .post-actions {
+                flex-direction: column;
+            }
+
+            .post-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+
+        /* Available Groups Styles */
+        .available-groups-list {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 2px solid #e4e6eb;
+            border-radius: 12px;
+            background: #f8f9fa;
+            padding: 0.5rem;
+        }
+
+        .available-group-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid #e4e6eb;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: white;
+        }
+
+        .available-group-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .available-group-item:hover {
+            background: #e7f3ff;
+            border-color: #1877f2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(24, 119, 242, 0.1);
+        }
+
+        .available-group-item.selected {
+            background: #1877f2;
+            color: white;
+            border-color: #1877f2;
+            box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3);
+        }
+
+        .available-group-item.selected .available-group-name,
+        .available-group-item.selected .available-group-url {
+            color: white;
+        }
+
+        .available-group-item.selected .available-group-url {
+            opacity: 0.8;
+        }
+
+        .available-group-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            margin-right: 1rem;
+            object-fit: cover;
+        }
+
+        .available-group-info {
+            flex: 1;
+        }
+
+        .available-group-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .available-group-url {
+            font-size: 0.875rem;
+            opacity: 0.7;
+            word-break: break-all;
+        }
+
+        .available-group-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .group-category-selector {
+            margin-top: 1rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            border: 2px solid #1877f2;
+            box-shadow: 0 4px 12px rgba(24, 119, 242, 0.1);
+        }
+
+        .group-category-selector h6 {
+            margin-bottom: 1rem;
+            color: #1c1e21;
+            font-weight: 600;
+        }
+
+        .group-category-selector .form-select {
+            margin-bottom: 1rem;
+            border: 2px solid #e4e6eb;
+            border-radius: 8px;
+            padding: 0.75rem;
+        }
+
+        .group-category-selector .form-select:focus {
+            border-color: #1877f2;
+            box-shadow: 0 0 0 3px rgba(24, 119, 242, 0.1);
+        }
+
+        .group-category-selector .btn {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .group-selection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, #1877f2 0%, #42a5f5 100%);
+            border-radius: 12px;
+            color: white;
+        }
+
+        .group-selection-header h5 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .group-selection-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .group-selection-actions .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+
+        .selected-groups-summary {
+            background: #e7f3ff;
+            border: 1px solid #1877f2;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .selected-groups-summary h6 {
+            color: #1877f2;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .selected-groups-count {
+            font-size: 0.875rem;
+            color: #65676b;
+        }
+
+        /* Category Group Loader Styles */
+        .group-loader-section {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            border: 1px solid #e4e6eb;
+        }
+
+        .group-loader-header h6 {
+            color: #1c1e21;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+
+
+        .category-groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 0.5rem;
+            scrollbar-width: thin;
+            scrollbar-color: #1877f2 #f0f2f5;
+        }
+
+        .category-groups-grid::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .category-groups-grid::-webkit-scrollbar-track {
+            background: #f0f2f5;
+            border-radius: 3px;
+        }
+
+        .category-groups-grid::-webkit-scrollbar-thumb {
+            background: #1877f2;
+            border-radius: 3px;
+        }
+
+        .category-groups-grid::-webkit-scrollbar-thumb:hover {
+            background: #1565c0;
+        }
+
+        .category-group-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid #e4e6eb;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: white;
+            height: 80px;
+        }
+
+        .category-group-item:hover {
+            background: #f8f9fa;
+            border-color: #1877f2;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(24, 119, 242, 0.1);
+        }
+
+        .category-group-item.selected {
+            background: #1877f2;
+            color: white;
+            border-color: #1877f2;
+            box-shadow: 0 2px 8px rgba(24, 119, 242, 0.2);
+        }
+
+        .category-group-item.selected .category-group-name,
+        .category-group-item.selected .category-group-url {
+            color: white;
+        }
+
+        .category-group-item.selected .category-group-url {
+            opacity: 0.8;
+        }
+
+        .category-group-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            margin-right: 0.75rem;
+            object-fit: cover;
+        }
+
+        .category-group-info {
+            flex: 1;
+        }
+
+        .category-group-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        /* Footer Styles */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 250, 0.95) 100%);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(228, 230, 235, 0.5);
+            padding: 0.75rem 0;
+            z-index: 200;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .footer-content {
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .footer-text {
+            font-size: 0.875rem;
+            color: #65676b;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-text:hover {
+            color: #1877f2;
+        }
+
+        /* Adjust main content to account for footer */
+        .main-content {
+            padding-bottom: 4rem;
+        }
+
+        /* Welcome Section Styles */
+        .welcome-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e4e6eb;
+            margin: 2rem 0;
+        }
+
+        .welcome-header {
+            margin-bottom: 3rem;
+        }
+
+        .welcome-icon {
+            font-size: 3rem;
+            color: #1877f2;
+            margin-bottom: 1.5rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1c1e21;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.1rem;
+            color: #65676b;
+            margin-bottom: 0;
+        }
+
+        .welcome-features {
+            margin-bottom: 3rem;
+        }
+
+        .feature-card {
+            background: white;
+            border: 2px solid #e4e6eb;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            height: 100%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: #1877f2;
+            box-shadow: 0 8px 25px rgba(24, 119, 242, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: #1877f2;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h5 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1c1e21;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-card p {
+            font-size: 0.9rem;
+            color: #65676b;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .welcome-footer {
+            border-top: 1px solid #e4e6eb;
+            padding-top: 2rem;
+        }
+
+        .welcome-instruction {
+            font-size: 1rem;
+            color: #65676b;
+            margin-bottom: 1.5rem;
+        }
+
+        .welcome-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1877f2;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #65676b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.25rem;
+        }
+
+        /* Account Selection Styles */
+        .account-selection-section {
+            background: linear-gradient(135deg, #f0f2f5 0%, #e4e6eb 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid #e4e6eb;
+        }
+
+        .account-selection-section h5 {
+            color: #1c1e21;
+            margin-bottom: 1rem;
         }
 
         /* Existing styles... */
@@ -1348,7 +2150,7 @@
         </div>
         <nav class="sidebar-nav">
             <div class="nav-item">
-                <a href="#" class="nav-link active" onclick="showSection('accounts', event)" title="Account Management">
+                <a href="#" class="nav-link" onclick="showSection('accounts', event)" title="Account Management">
                     <i class="fas fa-user-circle"></i>
                 </a>
             </div>
@@ -1382,6 +2184,102 @@
 
     <!-- Main Content -->
     <div class="main-content">
+        <!-- Welcome Section -->
+        <div id="welcome-section" class="content-section active">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-10 col-xl-8">
+                        <div class="welcome-card">
+                            <div class="welcome-header text-center">
+                                <div class="welcome-icon">
+                                    <i class="fas fa-rocket"></i>
+                                </div>
+                                <h2 class="welcome-title">Welcome to Facebook Auto Post</h2>
+                                <p class="welcome-subtitle">Your complete solution for managing Facebook content</p>
+                            </div>
+                            
+                            <div class="welcome-features">
+                                <div class="row">
+                                    <div class="col-md-6 col-lg-4 mb-4">
+                                        <div class="feature-card">
+                                            <div class="feature-icon">
+                                                <i class="fas fa-user-circle"></i>
+                                            </div>
+                                            <h5>Account Management</h5>
+                                            <p>Add and manage your Facebook accounts securely</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-4 mb-4">
+                                        <div class="feature-card">
+                                            <div class="feature-icon">
+                                                <i class="fas fa-users"></i>
+                                            </div>
+                                            <h5>Group Management</h5>
+                                            <p>Organize your Facebook groups into categories</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-4 mb-4">
+                                        <div class="feature-card">
+                                            <div class="feature-icon">
+                                                <i class="fas fa-image"></i>
+                                            </div>
+                                            <h5>Poster Management</h5>
+                                            <p>Create and save reusable post content</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-4 mb-4">
+                                        <div class="feature-card">
+                                            <div class="feature-icon">
+                                                <i class="fas fa-paper-plane"></i>
+                                            </div>
+                                            <h5>Create Posts</h5>
+                                            <p>Schedule and publish posts to multiple groups</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-4 mb-4">
+                                        <div class="feature-card">
+                                            <div class="feature-icon">
+                                                <i class="fas fa-clock"></i>
+                                            </div>
+                                            <h5>Scheduled Posts</h5>
+                                            <p>View your scheduled posts and history</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-4 mb-4">
+                                        <div class="feature-card">
+                                            <div class="feature-icon">
+                                                <i class="fas fa-chart-line"></i>
+                                            </div>
+                                            <h5>Analytics</h5>
+                                            <p>Track your posting performance and success</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="welcome-footer text-center">
+                                <p class="welcome-instruction">Use the sidebar navigation to get started</p>
+                                <div class="welcome-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-number">100%</div>
+                                        <div class="stat-label">Secure</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-number">24/7</div>
+                                        <div class="stat-label">Available</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-number">∞</div>
+                                        <div class="stat-label">Groups</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Post Creation Section -->
         <div id="post-section" class="content-section">
             <div class="container">
@@ -1461,10 +2359,7 @@
                                             Schedule Date & Time (optional)
                                         </div>
                                         <input type="datetime-local" id="scheduledDateTime" name="scheduledDateTime" class="form-control">
-                                        <div class="help-text mt-2">
-                                            <i class="fas fa-info-circle"></i>
-                                            Leave empty to post immediately.
-                                            </div>
+
                                     </div>
 
                                     <!-- Submit Section -->
@@ -1511,8 +2406,6 @@
                                 <button type="button" class="btn add-category-btn" onclick="addCategory()">
                                     <i class="fas fa-plus me-2"></i>Add New Category
                                 </button>
-
-
                             </div>
                         </div>
                     </div>
@@ -1566,19 +2459,21 @@
                                                 <div class="upload-area" onclick="document.getElementById('posterImages').click()">
                                                     <div class="upload-icon">
                                                         <i class="fas fa-cloud-upload-alt"></i>
-                                                    </div>
+                                    </div>
                                                     <h5 class="mb-2">Upload Images</h5>
                                                     <p class="text-muted mb-0">Click to select or drag and drop images here</p>
                                                     <p class="text-muted small mt-2">Supports: PNG, JPG, JPEG, GIF, BMP</p>
-                                                </div>
+                                </div>
                                                 <input type="file" class="d-none" id="posterImages" name="posterImages" multiple accept="image/*" onchange="handlePosterImageUpload()">
                                             </div>
                                         </div>
                                         <!-- Poster Image Previews -->
                                         <div id="posterImagePreviews" class="mt-4"></div>
+                                        
+
                                     <div class="text-center mt-3">
-                                            <button type="submit" class="btn btn-primary">
-                                                <i class="fas fa-save me-2"></i>Save Poster
+                                        <button type="submit" class="btn btn-primary" id="savePosterBtn">
+                                            <i class="fas fa-save me-2"></i>Save Poster
                                         </button>
                                     </div>
                                     </form>
@@ -1649,18 +2544,29 @@
                                 <p class="text-white-50 mb-0 mt-2">View your upcoming scheduled posts and post history</p>
                 </div>
                             <div class="card-body">
-                                <div id="scheduledPostsContainer">
-                                    <!-- Scheduled and published posts will be loaded here -->
+                                <div class="d-flex justify-content-end mb-3">
+                                    <button class="btn btn-danger" onclick="clearAllHistory()">
+                                        <i class="fas fa-trash me-2"></i>Clear History
+                                    </button>
                     </div>
+                                <div id="scheduledPostsContainer" class="scheduled-posts-container">
+                                    <!-- Scheduled and published posts will be loaded here -->
                 </div>
                 </div>
             </div>
         </div>
     </div>
+                </div>
+            </div>
         </div>
     </div>
 
-
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <span class="footer-text">Made with ❤️ by Raafat Sami</span>
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -1679,7 +2585,9 @@
             }
 
             // Load data for the section
-            if (section === 'groups') {
+            if (section === 'welcome') {
+                // Welcome section doesn't need data loading
+            } else if (section === 'groups') {
                 loadGroups();
             } else if (section === 'accounts') {
                 loadAccounts();
@@ -1697,11 +2605,12 @@
         }
 
         // Group Management Functions
-        let categories = JSON.parse(localStorage.getItem('fbGroups') || '[]');
+        let categories = [];
         let selectedGroups = [];
+        let availableGroups = [];
 
         // Account Management Functions
-        let accounts = JSON.parse(localStorage.getItem('fbAccounts') || '[]');
+        let accounts = [];
         let selectedAccount = null;
 
         // Poster Management Functions
@@ -1748,6 +2657,198 @@
         }
 
         function loadGroups() {
+            // Load categories from MongoDB
+            loadCategoriesFromMongoDB();
+        }
+
+        function populateAllCategoryAccountSelectors() {
+            categories.forEach((category, index) => {
+                const accountSelect = document.getElementById(`categoryAccountSelect-${index}`);
+                if (accountSelect) {
+                    accountSelect.innerHTML = '<option value="">Select an account...</option>';
+                    accounts.forEach(account => {
+                        accountSelect.innerHTML += `<option value="${account.user_id}">${account.account_name}</option>`;
+                    });
+                }
+            });
+        }
+
+        function loadGroupsForCategory(categoryIndex) {
+            const accountId = document.getElementById(`categoryAccountSelect-${categoryIndex}`).value;
+            
+            if (!accountId) {
+                showFloatingNotification('Please select an account first', 'error');
+                return;
+            }
+
+            // Show loading status
+            document.getElementById(`categoryLoadingStatus-${categoryIndex}`).classList.remove('d-none');
+            document.getElementById(`categoryGroupsContainer-${categoryIndex}`).classList.add('d-none');
+
+            fetch('/fetch_account_groups', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    account_id: accountId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById(`categoryLoadingStatus-${categoryIndex}`).classList.add('d-none');
+                
+                if (data.success) {
+                    displayCategoryGroups(categoryIndex, data.groups);
+                    showFloatingNotification(`Loaded ${data.total_groups} groups successfully!`, 'success');
+                } else {
+                    showFloatingNotification('Error loading groups: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                document.getElementById(`categoryLoadingStatus-${categoryIndex}`).classList.add('d-none');
+                showFloatingNotification('Error loading groups: ' + error.message, 'error');
+            });
+        }
+
+        function displayCategoryGroups(categoryIndex, groups) {
+            const container = document.getElementById(`categoryGroupsList-${categoryIndex}`);
+            const groupsContainer = document.getElementById(`categoryGroupsContainer-${categoryIndex}`);
+            
+            if (!container || !groupsContainer) return;
+            
+            // Store groups data for this category
+            categoryGroupsData[categoryIndex] = groups;
+            
+            if (groups.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center p-3">
+                        <i class="fas fa-info-circle text-muted" style="font-size: 1.5rem;"></i>
+                        <p class="mt-2 text-muted small">No groups found for this account.</p>
+                    </div>
+                `;
+            } else {
+                const groupsHtml = groups.map((group, index) => `
+                    <div class="category-group-item" onclick="toggleCategoryGroupSelection(${categoryIndex}, ${index})" data-category-group-index="${index}">
+                        <div class="form-check me-2 d-none">
+                            <input class="form-check-input" type="checkbox" id="category-group-${categoryIndex}-${index}" 
+                                   onchange="updateCategoryGroupSelection(${categoryIndex}, ${index}, this.checked)">
+                        </div>
+                        <img src="${group.image_url || 'https://via.placeholder.com/40x40/1877f2/ffffff?text=G'}" 
+                             alt="Group" class="category-group-avatar" 
+                             onerror="this.src='https://via.placeholder.com/40x40/1877f2/ffffff?text=G'">
+                        <div class="category-group-info">
+                            <div class="category-group-name">${group.name}</div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                container.innerHTML = groupsHtml;
+            }
+            
+            groupsContainer.classList.remove('d-none');
+        }
+
+        // Store category groups data
+        let categoryGroupsData = {};
+
+        function toggleCategoryGroupSelection(categoryIndex, groupIndex) {
+            const checkbox = document.getElementById(`category-group-${categoryIndex}-${groupIndex}`);
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                updateCategoryGroupSelection(categoryIndex, groupIndex, checkbox.checked);
+            }
+        }
+
+        function updateCategoryGroupSelection(categoryIndex, groupIndex, isSelected) {
+            const groupItem = document.querySelector(`[data-category-group-index="${groupIndex}"]`);
+            if (groupItem) {
+                if (isSelected) {
+                    groupItem.classList.add('selected');
+                } else {
+                    groupItem.classList.remove('selected');
+                }
+            }
+        }
+
+        function selectAllCategoryGroups(categoryIndex) {
+            const groups = categoryGroupsData[categoryIndex] || [];
+            groups.forEach((group, index) => {
+                const checkbox = document.getElementById(`category-group-${categoryIndex}-${index}`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                    updateCategoryGroupSelection(categoryIndex, index, true);
+                }
+            });
+        }
+
+        function deselectAllCategoryGroups(categoryIndex) {
+            const groups = categoryGroupsData[categoryIndex] || [];
+            groups.forEach((group, index) => {
+                const checkbox = document.getElementById(`category-group-${categoryIndex}-${index}`);
+                if (checkbox) {
+                    checkbox.checked = false;
+                    updateCategoryGroupSelection(categoryIndex, index, false);
+                }
+            });
+        }
+
+
+
+        function addSelectedGroupsToCategory(categoryIndex) {
+            const groups = categoryGroupsData[categoryIndex] || [];
+            const selectedGroups = [];
+            
+            // Get selected groups
+            groups.forEach((group, index) => {
+                const checkbox = document.getElementById(`category-group-${categoryIndex}-${index}`);
+                if (checkbox && checkbox.checked) {
+                    selectedGroups.push({ group, index });
+                }
+            });
+            
+            if (selectedGroups.length === 0) {
+                showFloatingNotification('Please select at least one group first', 'error');
+                return;
+            }
+
+            // Add selected groups to the category
+            selectedGroups.forEach(({ group }) => {
+                categories[categoryIndex].groups.push({
+                    name: group.name,
+                    id: group.id,
+                    member_count: group.member_count,
+                    image_url: group.image_url
+                });
+            });
+
+            // Save to MongoDB
+            saveCompleteUserData().then(() => {
+                // Reload categories display
+                loadCategoriesFromMongoDB();
+                
+                // Clear the groups container for this category
+                const groupsContainer = document.getElementById(`categoryGroupsContainer-${categoryIndex}`);
+                if (groupsContainer) {
+                    groupsContainer.classList.add('d-none');
+                }
+                
+                // Clear the account selector
+                const accountSelect = document.getElementById(`categoryAccountSelect-${categoryIndex}`);
+                if (accountSelect) {
+                    accountSelect.value = '';
+                }
+                
+                // Clear stored groups data
+                delete categoryGroupsData[categoryIndex];
+                
+                showFloatingNotification(`Added ${selectedGroups.length} group(s) to category successfully!`, 'success');
+            });
+        }
+
+
+
+                function loadCategoriesFromMongoDB() {
             const container = document.getElementById('categoriesContainer');
             
             if (!container) {
@@ -1758,18 +2859,18 @@
                 container.innerHTML = `
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle me-2"></i>
-                        No groups added yet. Click "Add New Category" to get started.
+                        No categories added yet. Click "Add New Category" to get started.
                     </div>
                 `;
                 return;
             }
 
             const htmlContent = categories.map((category, index) => `
-                <div class="group-category" onclick="toggleGroupCategory(${index})">
-                    <div class="category-header">
+                                <div class="group-category">
+                    <div class="category-header" onclick="toggleGroupCategory(${index})">
                         <div class="category-info">
                             <i class="fas fa-folder me-2"></i>
-                        <span class="category-name">${category.name}</span>
+                            <span class="category-name">${category.name}</span>
                             <span class="category-count">(${category.groups.length} groups)</span>
                         </div>
                         <div class="category-actions">
@@ -1778,10 +2879,11 @@
                             </button>
                             <div class="category-arrow">
                                 <i class="fas fa-chevron-down"></i>
+                            </div>
                         </div>
                     </div>
-                    </div>
                     <div class="category-content">
+                        <!-- Existing Groups -->
                     <div class="group-list">
                         ${category.groups.map((group, groupIndex) => `
                             <div class="group-tag">
@@ -1790,7 +2892,6 @@
                                          onerror="this.src='https://via.placeholder.com/48x48/1877f2/ffffff?text=G'">
                                     <div class="group-info">
                                         <span class="group-name">${group.name}</span>
-                                <span class="member-count">(${group.member_count})</span>
                                     </div>
                                     <button class="remove-group" onclick="removeGroupFromCategory(${index}, ${groupIndex}); event.stopPropagation();">
                                     <i class="fas fa-times"></i>
@@ -1799,24 +2900,42 @@
                         `).join('')}
                         </div>
                         
-                        <!-- Add Group Input for this category -->
-                        <div class="add-group-section" onclick="event.stopPropagation();">
+                        <!-- Group Loader Section -->
+                        <div class="group-loader-section" onclick="event.stopPropagation();">
+                            <div class="group-loader-header">
+                                <h6><i class="fas fa-download me-2"></i>Load Groups from Account</h6>
+                            </div>
                             <div class="row">
                                 <div class="col-md-8">
-                                    <div class="floating-label">
-                                        <input type="text" 
-                                               class="form-control" 
-                                               placeholder=" " 
-                                               id="groupInput-${index}"
-                                               onkeypress="handleGroupInputKeypress(event, ${index})">
-                                        <label for="groupInput-${index}">Enter Facebook Group ID</label>
-                                    </div>
+                                    <select class="form-select" id="categoryAccountSelect-${index}">
+                                        <option value="">Select an account...</option>
+                                    </select>
                                 </div>
                                 <div class="col-md-4">
-                                    <button type="button" 
-                                            class="btn btn-primary w-100" 
-                                            onclick="fetchAndAddGroupToCategory(${index})">
-                                        <i class="fas fa-plus me-2"></i>Add Group
+                                    <button type="button" class="btn btn-primary btn-sm w-100" onclick="loadGroupsForCategory(${index}); event.stopPropagation();">
+                                        <i class="fas fa-download me-1"></i>Load
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Loading Status -->
+                            <div id="categoryLoadingStatus-${index}" class="d-none">
+                                <div class="text-center mt-2">
+                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <span class="ms-2">Loading groups...</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Available Groups for this Category -->
+                            <div id="categoryGroupsContainer-${index}" class="d-none">
+                                <div id="categoryGroupsList-${index}" class="category-groups-grid">
+                                    <!-- Groups will be loaded here -->
+                                </div>
+                                <div class="text-center mt-3">
+                                    <button type="button" class="btn btn-primary w-100" onclick="addSelectedGroupsToCategory(${index}); event.stopPropagation();">
+                                        <i class="fas fa-plus me-2"></i>Add Selected Groups
                                     </button>
                                 </div>
                             </div>
@@ -1826,8 +2945,8 @@
             `).join('');
 
             container.innerHTML = htmlContent;
-            // Update category dropdown
             updateCategoryDropdown();
+            populateAllCategoryAccountSelectors();
         }
 
         function updateCategoryDropdown() {
@@ -1842,79 +2961,7 @@
             });
         }
 
-        function fetchAndAddGroupToCategory(categoryIndex) {
-            const groupId = document.getElementById(`groupInput-${categoryIndex}`).value.trim();
 
-            if (!groupId) {
-                alert('Please enter a group ID');
-                return;
-            }
-
-            if (!selectedAccount) {
-                alert('Please select an account first');
-                return;
-            }
-
-            // Show loading
-            const button = event.target;
-            const originalText = button.innerHTML;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Fetching...';
-            button.disabled = true;
-
-            fetch('/fetch_group_info', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    group_id: groupId,
-                    cookies: selectedAccount.cookies
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Save group to MongoDB
-                        return saveGroupToMongoDB({
-                            group_name: data.group_name,
-                            group_id: data.group_id,
-                            member_count: data.member_count,
-                            group_image_url: data.group_image_url,
-                            category_index: categoryIndex
-                        });
-                    } else {
-                        throw new Error(data.error);
-                    }
-                })
-                .then(saveResult => {
-                    if (saveResult.success) {
-                        // Reload data from MongoDB
-                        loadUserDataFromMongoDB();
-
-                        // Clear form
-                        document.getElementById(`groupInput-${categoryIndex}`).value = '';
-
-                        // Show success message
-                        showFloatingNotification('Group added successfully!', 'success');
-                        } else {
-                        throw new Error(saveResult.error);
-                    }
-                })
-                .catch(error => {
-                    showFloatingNotification('Error: ' + error.message, 'error');
-                })
-                .finally(() => {
-                    // Reset button
-                    button.innerHTML = originalText;
-                    button.disabled = false;
-                });
-        }
-
-        function handleGroupInputKeypress(event, categoryIndex) {
-            if (event.key === 'Enter') {
-                fetchAndAddGroupToCategory(categoryIndex);
-            }
-        }
 
         function addCategory() {
             const categoryName = prompt('Enter category name:');
@@ -1924,7 +2971,7 @@
                     groups: []
                 });
                 saveCompleteUserData().then(() => {
-                loadGroups();
+                    loadCategoriesFromMongoDB();
                 });
             }
         }
@@ -1933,7 +2980,7 @@
             if (confirm('Are you sure you want to remove this category?')) {
                 categories.splice(index, 1);
                 saveCompleteUserData().then(() => {
-                loadGroups();
+                    loadCategoriesFromMongoDB();
                 });
             }
         }
@@ -1941,7 +2988,7 @@
         function removeGroupFromCategory(categoryIndex, groupIndex) {
             categories[categoryIndex].groups.splice(groupIndex, 1);
             saveCompleteUserData().then(() => {
-            loadGroups();
+                loadCategoriesFromMongoDB();
             });
         }
 
@@ -1989,7 +3036,6 @@
                                          onerror="this.src='https://via.placeholder.com/48x48/1877f2/ffffff?text=G'">
                                     <div class="group-info">
                                         <span class="group-name">${group.name}</span>
-                                        <span class="member-count">(${group.member_count})</span>
                                     </div>
                                 </div>
                             `).join('')}
@@ -2201,30 +3247,46 @@
             console.log('Manual image upload is disabled. Please use posters instead.');
         }
 
-        // Drag and drop functionality
-        const uploadArea = document.querySelector('.upload-area');
+        // Drag and drop functionality for upload area
+        function setupUploadAreaDragAndDrop() {
+            const uploadArea = document.querySelector('.upload-area');
+            if (!uploadArea) return;
 
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.style.borderColor = '#42a5f5';
-            uploadArea.style.background = 'linear-gradient(135deg, #e7f3ff 0%, #f0f2f5 100%)';
-        });
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#42a5f5';
+                uploadArea.style.background = 'linear-gradient(135deg, #e7f3ff 0%, #f0f2f5 100%)';
+            });
 
-        uploadArea.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            uploadArea.style.borderColor = '#1877f2';
-            uploadArea.style.background = 'linear-gradient(135deg, #f0f2f5 0%, #e4e6eb 100%)';
-        });
+            uploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#1877f2';
+                uploadArea.style.background = 'linear-gradient(135deg, #f0f2f5 0%, #e4e6eb 100%)';
+            });
 
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.style.borderColor = '#1877f2';
-            uploadArea.style.background = 'linear-gradient(135deg, #f0f2f5 0%, #e4e6eb 100%)';
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#1877f2';
+                uploadArea.style.background = 'linear-gradient(135deg, #f0f2f5 0%, #e4e6eb 100%)';
 
-            const files = e.dataTransfer.files;
-            document.getElementById('images').files = files;
-            handleImageUpload();
-        });
+                const files = e.dataTransfer.files;
+                const fileInput = document.getElementById('posterImages');
+                
+                // Create a DataTransfer object to set files
+                const dataTransfer = new DataTransfer();
+                for (let file of files) {
+                    if (file.type.startsWith('image/')) {
+                        dataTransfer.items.add(file);
+                    }
+                }
+                
+                fileInput.files = dataTransfer.files;
+                handlePosterImageUpload();
+            });
+        }
+
+        // Initialize upload area drag and drop
+        setupUploadAreaDragAndDrop();
 
         // Add poster form submission handler
         document.getElementById('posterForm').addEventListener('submit', function(e) {
@@ -2377,7 +3439,7 @@
         }
 
         // Initialize
-        showSection('accounts');
+        showSection('welcome');
         
         // Set minimum date for datetime picker
         function setMinDateTime() {
@@ -2438,7 +3500,10 @@
                             <div class="poster-caption">${poster.caption.substring(0, 100)}${poster.caption.length > 100 ? '...' : ''}</div>
                         </div>
                         <div class="poster-actions">
-                            <button class="remove-poster-btn" onclick="removePoster(${index})">
+                            <button class="edit-poster-btn" onclick="loadPosterForEditing(${index})" title="Edit poster">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="remove-poster-btn" onclick="removePoster(${index})" title="Delete poster">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -2457,87 +3522,204 @@
             container.innerHTML = htmlContent;
         }
 
+        // Global variable to store current images
+        let currentImages = [];
+
         function handlePosterImageUpload() {
             const fileInput = document.getElementById('posterImages');
             const previewContainer = document.getElementById('posterImagePreviews');
 
-            previewContainer.innerHTML = '';
-
             if (fileInput.files.length > 0) {
+                // Convert new files to image objects
+                const newImagePromises = [];
                 for (let i = 0; i < fileInput.files.length; i++) {
                     const file = fileInput.files[i];
+                    const promise = new Promise((resolve) => {
                     const reader = new FileReader();
-
                     reader.onload = function (e) {
-                        const previewDiv = document.createElement('div');
-                        previewDiv.className = 'image-preview-container fade-in-up';
-                        previewDiv.innerHTML = `
+                            resolve({
+                                id: Date.now() + Math.random(), // Unique ID for drag/drop
+                                name: file.name,
+                                caption: '',
+                                data: e.target.result,
+                                file: file // Keep reference to original file
+                            });
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                    newImagePromises.push(promise);
+                }
+
+                // Add new images to existing ones
+                Promise.all(newImagePromises).then(newImages => {
+                    currentImages = [...currentImages, ...newImages];
+                    renderImagePreviews();
+                });
+            }
+
+            // Clear the file input for next upload
+            fileInput.value = '';
+        }
+
+        function renderImagePreviews() {
+            const previewContainer = document.getElementById('posterImagePreviews');
+            
+            if (currentImages.length === 0) {
+                previewContainer.innerHTML = `
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-images fa-3x mb-3"></i>
+                        <p>No images uploaded yet. Upload images above to get started.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const htmlContent = currentImages.map((image, index) => `
+                <div class="image-preview-container fade-in-up" data-image-id="${image.id}" draggable="true">
                             <div class="row align-items-center">
-                                <div class="col-md-3 text-center">
-                                    <img src="${e.target.result}" class="image-preview" alt="Preview">
+                        <div class="col-md-2 text-center">
+                            <div class="image-preview-wrapper">
+                                <img src="${image.data}" class="image-preview" alt="Preview">
+                                <div class="image-actions">
+                                    <button type="button" class="btn btn-sm btn-danger remove-image-btn" onclick="removeImage(${index})" title="Remove image">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    <div class="drag-handle" title="Drag to reorder">
+                                        <i class="fas fa-grip-vertical"></i>
                                 </div>
-                                <div class="col-md-9">
-                                    <label class="form-label">Caption for ${file.name} (Optional)</label>
-                                    <input type="text" class="form-control poster-image-caption" 
-                                           placeholder="Enter a caption for this image...">
+                                </div>
+                                <div class="image-order-badge">${index + 1}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-10">
+                            <label class="form-label">Caption for ${image.name} (Optional)</label>
+                            <input type="text" class="form-control poster-image-caption" 
+                                   placeholder="Enter a caption for this image..."
+                                   value="${image.caption || ''}"
+                                   onchange="updateImageCaption(${index}, this.value)">
                                     <div class="help-text mt-2">
                                         <i class="fas fa-info-circle"></i>
                                         Add a specific caption for this image
                                     </div>
                                 </div>
                             </div>
-                        `;
-                        previewContainer.appendChild(previewDiv);
-                    };
+                </div>
+            `).join('');
 
-                    reader.readAsDataURL(file);
+            previewContainer.innerHTML = htmlContent;
+            
+            // Add drag and drop functionality for reordering
+            setupImageDragAndDrop();
+        }
+
+        function setupImageDragAndDrop() {
+            const containers = document.querySelectorAll('.image-preview-container');
+            
+            containers.forEach(container => {
+                container.addEventListener('dragstart', handleDragStart);
+                container.addEventListener('dragover', handleDragOver);
+                container.addEventListener('drop', handleDrop);
+                container.addEventListener('dragenter', handleDragEnter);
+                container.addEventListener('dragleave', handleDragLeave);
+            });
+        }
+
+        function handleDragStart(e) {
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', e.target.outerHTML);
+            e.target.classList.add('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleDragEnter(e) {
+            e.preventDefault();
+            e.target.closest('.image-preview-container')?.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.target.closest('.image-preview-container')?.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const draggingElement = document.querySelector('.dragging');
+            const dropTarget = e.target.closest('.image-preview-container');
+            
+            if (draggingElement && dropTarget && draggingElement !== dropTarget) {
+                const draggingId = draggingElement.dataset.imageId;
+                const dropId = dropTarget.dataset.imageId;
+                
+                // Find indices
+                const draggingIndex = currentImages.findIndex(img => img.id == draggingId);
+                const dropIndex = currentImages.findIndex(img => img.id == dropId);
+                
+                if (draggingIndex !== -1 && dropIndex !== -1) {
+                    // Reorder array
+                    const [movedImage] = currentImages.splice(draggingIndex, 1);
+                    currentImages.splice(dropIndex, 0, movedImage);
+                    
+                    // Re-render to update order
+                    renderImagePreviews();
                 }
+            }
+            
+            // Clean up
+            document.querySelectorAll('.image-preview-container').forEach(container => {
+                container.classList.remove('dragging', 'drag-over');
+            });
+        }
+
+        function removeImage(index) {
+            currentImages.splice(index, 1);
+            renderImagePreviews();
+        }
+
+        function updateImageCaption(index, caption) {
+            if (currentImages[index]) {
+                currentImages[index].caption = caption;
             }
         }
 
+
+
         function savePoster() {
+            const saveBtn = document.getElementById('savePosterBtn');
+            if (!saveBtn) return;
+
+            // Show loading state
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+
             const name = document.getElementById('posterName').value.trim();
             const caption = document.getElementById('posterCaption').value.trim();
-            const fileInput = document.getElementById('posterImages');
-            const captionInputs = document.querySelectorAll('.poster-image-caption');
 
-            if (!name || !caption || fileInput.files.length === 0) {
+            if (!name || !caption || currentImages.length === 0) {
                 showFloatingNotification('Please fill in all required fields and upload at least one image.', 'error');
+                // Reset button state
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="fas fa-save me-2"></i>Save Poster';
                 return;
             }
 
-            // Convert files to base64 and collect captions
-            const imagePromises = [];
-            for (let i = 0; i < fileInput.files.length; i++) {
-                const file = fileInput.files[i];
-                const caption = captionInputs[i] ? captionInputs[i].value.trim() : '';
-                
-                const promise = new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        resolve({
-                            name: file.name,
-                            caption: caption,
-                            data: e.target.result
-                        });
-                    };
-                    reader.readAsDataURL(file);
-                });
-                imagePromises.push(promise);
-            }
+            // Prepare images data (remove file reference, keep only necessary data)
+            const imagesData = currentImages.map(image => ({
+                name: image.name,
+                caption: image.caption || '',
+                data: image.data
+            }));
 
-            // Wait for all images to be converted
-            Promise.all(imagePromises)
-                .then(images => {
-                    // Save poster to MongoDB
-                    const posterData = {
-                        name: name,
-                        caption: caption,
-                        images: images
-                    };
+            // Save poster to MongoDB
+            const posterData = {
+                name: name,
+                caption: caption,
+                images: imagesData
+            };
 
-                    return savePosterToMongoDB(posterData);
-                })
+            savePosterToMongoDB(posterData)
                 .then(result => {
                     if (result.success) {
                         // Reload data from MongoDB
@@ -2545,7 +3727,8 @@
                         
                         // Clear form
                         document.getElementById('posterForm').reset();
-                        document.getElementById('posterImagePreviews').innerHTML = '';
+                        currentImages = [];
+                        renderImagePreviews();
 
                         showFloatingNotification('Poster saved successfully!', 'success');
                     } else {
@@ -2554,6 +3737,11 @@
                 })
                 .catch(error => {
                     showFloatingNotification('Error saving poster: ' + error.message, 'error');
+                })
+                .finally(() => {
+                    // Reset button state
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i class="fas fa-save me-2"></i>Save Poster';
                 });
         }
 
@@ -2601,6 +3789,26 @@
             selectedPoster = posters[index];
             loadPosterSelector();
             updateSelectedPosterDisplay();
+        }
+
+        function loadPosterForEditing(index) {
+            const poster = posters[index];
+            if (!poster) return;
+
+            // Populate form fields
+            document.getElementById('posterName').value = poster.name;
+            document.getElementById('posterCaption').value = poster.caption;
+            
+            // Convert poster images to currentImages format
+            currentImages = poster.images.map((image, imgIndex) => ({
+                id: Date.now() + imgIndex + Math.random(), // Generate unique ID
+                name: image.name,
+                caption: image.caption || '',
+                data: image.data
+            }));
+            
+            // Render the images
+            renderImagePreviews();
         }
 
         function updateSelectedPosterDisplay() {
@@ -2847,9 +4055,10 @@
             
             if (posts.length === 0) {
                 container.innerHTML = `
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        No scheduled or published posts yet. Schedule your first post in the Create Post section.
+                    <div class="empty-state">
+                        <i class="fas fa-clock"></i>
+                        <h4>No Posts Yet</h4>
+                        <p>You haven't scheduled or published any posts yet. Create your first post in the Create Post section.</p>
                     </div>
                 `;
                 return;
@@ -2857,8 +4066,9 @@
 
             const htmlContent = posts.map((post, index) => {
                 // Parse UTC times and convert to local time for display
-                const scheduledTime = new Date(post.scheduled_time + 'Z'); // Ensure UTC parsing
-                const createdTime = new Date(post.created_at + 'Z'); // Ensure UTC parsing
+                const scheduledTime = new Date(post.scheduled_time + 'Z');
+                const createdTime = new Date(post.created_at + 'Z');
+                const publishedTime = post.published_at ? new Date(post.published_at + 'Z') : null;
                 
                 // Debug time conversion for the first post
                 if (index === 0) {
@@ -2869,47 +4079,80 @@
                 
                 let statusBadge = '';
                 let statusClass = '';
+                let statusIcon = '';
                 
                 switch (status) {
                     case 'scheduled':
-                        statusBadge = '<span class="badge bg-warning">Scheduled</span>';
+                        statusBadge = '<span class="status-badge scheduled"><i class="fas fa-clock"></i>Scheduled</span>';
                         statusClass = 'scheduled';
+                        statusIcon = 'fas fa-clock';
                         break;
                     case 'published':
-                        statusBadge = '<span class="badge bg-success">Published</span>';
+                        statusBadge = '<span class="status-badge published"><i class="fas fa-check-circle"></i>Published</span>';
                         statusClass = 'published';
+                        statusIcon = 'fas fa-check-circle';
                         break;
                     case 'partial':
-                        statusBadge = '<span class="badge bg-warning">Partial</span>';
+                        statusBadge = '<span class="status-badge partial"><i class="fas fa-exclamation-triangle"></i>Partial</span>';
                         statusClass = 'partial';
+                        statusIcon = 'fas fa-exclamation-triangle';
                         break;
                     case 'failed':
-                        statusBadge = '<span class="badge bg-danger">Failed</span>';
+                        statusBadge = '<span class="status-badge failed"><i class="fas fa-times-circle"></i>Failed</span>';
                         statusClass = 'failed';
+                        statusIcon = 'fas fa-times-circle';
                         break;
                     default:
-                        statusBadge = '<span class="badge bg-secondary">Unknown</span>';
+                        statusBadge = '<span class="status-badge unknown"><i class="fas fa-question-circle"></i>Unknown</span>';
                         statusClass = 'unknown';
+                        statusIcon = 'fas fa-question-circle';
                 }
                 
                 let resultInfo = '';
+                let resultClass = '';
+                
                 if (post.result) {
                     if (post.result.successful_posts !== undefined) {
-                        resultInfo = `
-                            <div class="mt-2">
-                                <small class="text-muted">
-                                    <i class="fas fa-chart-bar me-1"></i>
-                                    ${post.result.successful_posts} of ${post.result.total_groups} groups successful
-                                </small>
-                            </div>
-                        `;
+                        const successRate = post.result.successful_posts / post.result.total_groups;
+                        if (successRate === 1) {
+                            resultClass = 'success';
+                            resultInfo = `
+                                <div class="result-info ${resultClass}">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fas fa-check-circle text-success"></i>
+                                        <strong>Success!</strong> Published to all ${post.result.total_groups} groups
+                                    </div>
+                                </div>
+                            `;
+                        } else if (successRate > 0) {
+                            resultClass = 'warning';
+                            resultInfo = `
+                                <div class="result-info ${resultClass}">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fas fa-exclamation-triangle text-warning"></i>
+                                        <strong>Partial Success:</strong> ${post.result.successful_posts} of ${post.result.total_groups} groups
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            resultClass = 'error';
+                            resultInfo = `
+                                <div class="result-info ${resultClass}">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fas fa-times-circle text-danger"></i>
+                                        <strong>Failed:</strong> 0 of ${post.result.total_groups} groups
+                                    </div>
+                                </div>
+                            `;
+                        }
                     } else if (post.result.error) {
+                        resultClass = 'error';
                         resultInfo = `
-                            <div class="mt-2">
-                                <small class="text-danger">
-                                    <i class="fas fa-exclamation-triangle me-1"></i>
-                                    ${post.result.error}
-                                </small>
+                            <div class="result-info ${resultClass}">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="fas fa-exclamation-triangle text-danger"></i>
+                                    <strong>Error:</strong> ${post.result.error}
+                                </div>
                             </div>
                         `;
                     }
@@ -2918,39 +4161,106 @@
                 let deleteButton = '';
                 if (status === 'scheduled') {
                     deleteButton = `
-                        <button class="btn btn-outline-danger btn-sm" onclick="deleteScheduledPost('${post._id}')">
-                            <i class="fas fa-trash"></i> Cancel
+                        <button class="action-btn cancel" onclick="deleteScheduledPost('${post._id}')">
+                            <i class="fas fa-trash"></i>
+                            Cancel Post
                         </button>
                     `;
                 }
                 
                 return `
-                    <div class="card mb-3 ${statusClass}-post">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div class="flex-grow-1">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <h6 class="card-title mb-0 me-2">${post.poster_name}</h6>
-                                        ${statusBadge}
-                                    </div>
-                                    <p class="card-text text-muted mb-2">
-                                        <i class="fas fa-user me-1"></i> ${post.account_name}
-                                    </p>
-                                    <p class="card-text text-muted mb-2">
-                                        <i class="fas fa-users me-1"></i> ${post.groups ? post.groups.length : 0} groups
-                                    </p>
-                                    <p class="card-text text-muted mb-2">
-                                        <i class="fas fa-clock me-1"></i> Scheduled for: ${scheduledTime.toLocaleString('en-US', { timeZoneName: 'short' })}
-                                    </p>
-                                    <p class="card-text text-muted mb-2">
-                                        <i class="fas fa-calendar-plus me-1"></i> Created: ${createdTime.toLocaleString('en-US', { timeZoneName: 'short' })}
-                                    </p>
-                                    ${resultInfo}
+                    <div class="post-card ${statusClass}">
+                        <div class="post-header">
+                            <div class="post-info">
+                                <div class="post-title">
+                                    <i class="${statusIcon}"></i>
+                                    ${post.poster_name}
                                 </div>
-                                <div class="ms-3">
-                                    ${deleteButton}
+                                <div class="post-meta">
+                                    <div class="meta-item">
+                                        <i class="fas fa-user"></i>
+                                        ${post.account_name}
+                                    </div>
+                                    <div class="meta-item">
+                                        <i class="fas fa-users"></i>
+                                        ${post.groups ? post.groups.length : 0} groups
+                                    </div>
                                 </div>
                             </div>
+                            <div class="post-status">
+                                ${statusBadge}
+                            </div>
+                        </div>
+                        
+                        <div class="post-body">
+                            <div class="post-details">
+                                <div class="detail-item">
+                                    <div class="detail-label">Scheduled For</div>
+                                    <div class="detail-value">
+                                        <i class="fas fa-calendar-alt me-1"></i>
+                                        ${scheduledTime.toLocaleDateString('en-US', { 
+                                            weekday: 'long', 
+                                            year: 'numeric', 
+                                            month: 'long', 
+                                            day: 'numeric' 
+                                        })}
+                                    </div>
+                                    <div class="detail-value">
+                                        <i class="fas fa-clock me-1"></i>
+                                        ${scheduledTime.toLocaleTimeString('en-US', { 
+                                            hour: '2-digit', 
+                                            minute: '2-digit',
+                                            timeZoneName: 'short'
+                                        })}
+                                    </div>
+                                </div>
+                                
+                                <div class="detail-item">
+                                    <div class="detail-label">Created</div>
+                                    <div class="detail-value">
+                                        <i class="fas fa-calendar-plus me-1"></i>
+                                        ${createdTime.toLocaleDateString('en-US', { 
+                                            month: 'short', 
+                                            day: 'numeric', 
+                                            year: 'numeric' 
+                                        })}
+                                    </div>
+                                    <div class="detail-value">
+                                        <i class="fas fa-clock me-1"></i>
+                                        ${createdTime.toLocaleTimeString('en-US', { 
+                                            hour: '2-digit', 
+                                            minute: '2-digit' 
+                                        })}
+                                    </div>
+                                </div>
+                                
+                                ${publishedTime ? `
+                                <div class="detail-item">
+                                    <div class="detail-label">Published</div>
+                                    <div class="detail-value">
+                                        <i class="fas fa-calendar-check me-1"></i>
+                                        ${publishedTime.toLocaleDateString('en-US', { 
+                                            month: 'short', 
+                                            day: 'numeric', 
+                                            year: 'numeric' 
+                                        })}
+                                    </div>
+                                    <div class="detail-value">
+                                        <i class="fas fa-clock me-1"></i>
+                                        ${publishedTime.toLocaleTimeString('en-US', { 
+                                            hour: '2-digit', 
+                                            minute: '2-digit' 
+                                        })}
+                                    </div>
+                                </div>
+                                ` : ''}
+                            </div>
+                            
+                            ${deleteButton ? `
+                            <div class="post-actions">
+                                ${deleteButton}
+                            </div>
+                            ` : ''}
                         </div>
                     </div>
                 `;
@@ -2985,6 +4295,28 @@
                 .catch(error => {
                     showFloatingNotification('Error cancelling post: ' + error.message, 'error');
                 });
+        }
+
+        function clearAllHistory() {
+            if (!confirm('Are you sure you want to clear all scheduled and published posts? This cannot be undone.')) {
+                return;
+            }
+            fetch('/clear_scheduled_history', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showFloatingNotification('All scheduled and published posts have been deleted.', 'success');
+                    loadScheduledPosts();
+                } else {
+                    showFloatingNotification('Error: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showFloatingNotification('Error clearing history: ' + error.message, 'error');
+            });
         }
     </script>
 </body>
